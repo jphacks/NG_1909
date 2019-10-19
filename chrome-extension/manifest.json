@@ -4,8 +4,7 @@
       "description": "Tracking your eyes!",
       "permissions": ["activeTab", "declarativeContent", "storage"],
       "background": {
-          "scripts": ["background.js"],
-          "persistent": false
+          "scripts": ["background.js"]
       },
       "options_page": "options.html",
       "browser_action": {
