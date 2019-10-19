@@ -150,6 +150,7 @@ var setup = function() {
     console.log(width, height);
     if (appendLoop) stopAppending();
 
+    console.log("local strage's page_url ", localStorage.getItem("page_url"));
     if (localStorage.getItem("page_url") !== '') {
         if (!localStorage.getItem("0")) {
             postData();
@@ -182,6 +183,8 @@ function stopAppending() {
 
 function postPageData() {
     var url = 'chromex/start_session';
+    console.log("local strage's domain", localStorage.getItem("domain"));
+    console.log("local strage's path", localStorage.getItem("domain"));
     var postData = {
         'token': token,
         'domain': localStorage.getItem("domain"),
@@ -245,6 +248,7 @@ function clearGazerData() {
 
 function postData() {
     var url = 'chromex/page_views';
+    console.log("local strage's runs ", localStorage.getItem("runs"));
     for (var i = 0; i < Number(localStorage.getItem("runs")); i++) {
         var str = localStorage.getItem(String(i));
         if (str) {
@@ -256,7 +260,7 @@ function postData() {
                 'y': strData[2],
             }
             eyeData.push(json);
-            console.log('push ' + i);
+            console.log('maked json[', i, "]", json);
         }
     }
 
