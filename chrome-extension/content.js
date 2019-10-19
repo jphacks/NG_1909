@@ -159,6 +159,7 @@ function stopAppending() {
 }
 
 function postPageData() {
+    var url = 'https://51312073.ngrok.io/chromex/start_session';
     var postData = {
         'token': token,
         'domain': location.origin,
@@ -183,8 +184,10 @@ function appendData() {
     video.style.display = 'none';
     faceOverlay.style.display = 'none';
     if (page_url !== location.origin + location.pathname) {
-        stopAppending();
-        postData();
+        if (page_url !== '') {
+            stopAppending();
+            postData();
+        }
         eyeData = [];
         page_url = location.origin + location.pathname;
         postPageData();
@@ -206,7 +209,7 @@ function appendData() {
 }
 
 function postData() {
-    var url = 'http://127.0.0.1:5000/postData'
+    var url = 'https://51312073.ngrok.io/chromex/start_session'
     var postMsg = {
         'token': token,
         'visit_time': visit_time,
