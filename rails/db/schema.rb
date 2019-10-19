@@ -21,11 +21,10 @@ ActiveRecord::Schema.define(version: 2019_10_19_045226) do
 
   create_table "page_versions", force: :cascade do |t|
     t.integer "page_id"
-    t.integer "capture_path_id"
+    t.text "capture_path"
     t.string "version"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["capture_path_id"], name: "index_page_versions_on_capture_path_id"
     t.index ["page_id"], name: "index_page_versions_on_page_id"
   end
 

@@ -1,6 +1,5 @@
 class PageVersion < ApplicationRecord
   belongs_to :page
-  belongs_to :capture_path
 
   def self.find_or_create_by_page(page)
     page_version = page.page_versions.last
