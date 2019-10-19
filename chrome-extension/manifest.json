@@ -25,7 +25,7 @@
       },
       "content_scripts": [{
           "matches": ["https://*/*"],
-          "js": ["content.js", "webgazer.js"]
+          "js": ["exclude.json", "content.js", "webgazer.js"]
       }],
       "manifest_version": 2
   }
