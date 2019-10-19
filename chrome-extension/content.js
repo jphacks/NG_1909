@@ -11,6 +11,7 @@ token = '';
 session_id = 0;
 page_version_id = 0;
 visit_time = new Date();
+URL_INI = 'https://51312073.ngrok.io/';
 
 setTimeout(function() {
     initGazer();
@@ -159,13 +160,14 @@ function stopAppending() {
 }
 
 function postPageData() {
+    var url = 'chromex/start_session';
     var postData = {
         'token': token,
         'domain': location.origin,
         'path': location.pathname,
     };
 
-    fetch(url, {
+    fetch(URL_INI + url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -183,8 +185,10 @@ function appendData() {
     video.style.display = 'none';
     faceOverlay.style.display = 'none';
     if (page_url !== location.origin + location.pathname) {
-        stopAppending();
-        postData();
+        if (page_url !== '') {
+            stopAppending();
+            postData();
+        }
         eyeData = [];
         page_url = location.origin + location.pathname;
         postPageData();
@@ -206,7 +210,7 @@ function appendData() {
 }
 
 function postData() {
-    var url = 'http://127.0.0.1:5000/postData'
+    var url = 'chromex/page_views';
     var postMsg = {
         'token': token,
         'visit_time': visit_time,
@@ -214,7 +218,7 @@ function postData() {
         'page_version_id': page_version_id,
         'gazes': eyeData,
     };
-    fetch(url, {
+    fetch(URL_INI + url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
