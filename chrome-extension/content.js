@@ -149,7 +149,24 @@ var setup = function() {
     //drawLoop();
     console.log(width, height);
     if (appendLoop) stopAppending();
+    localStorage.setItem("visit_time", String(new Date()));
+
+    if (localStorage.getItem("page_url") !== '') {
+        stopAppending();
+        postData();
+    }
+    eyeData = [];
+    localStorage.clear();
+    localStorage.setItem("page_url", location.origin + location.pathname);
+    postPageData();
+    if (exclude_path(location.origin)) {
+        localStorage.setItem("page_url", '');
+    }
     visit_time = new Date();
+    runs = 0;
+    localStorage.setItem("domain", location.origin);
+    localStorage.setItem("path", location.pathname);
+
     setTimeout(appendLoop = setInterval(appendData, 100), 5000);
 
 }
@@ -163,8 +180,8 @@ function postPageData() {
     var url = 'chromex/start_session';
     var postData = {
         'token': token,
-        'domain': location.origin,
-        'path': location.pathname,
+        'domain': localStorage.getItem("domain"),
+        'path': localStorage.getItem("path"),
     };
 
     fetch(URL_INI + url, {
@@ -175,49 +192,65 @@ function postPageData() {
             body: JSON.stringify(postData),
         }).then(res => res.json())
         .then(function(response) {
-            session_id = response.data.session_id;
-            page_version_id = response.data.page_version_id;
+            localStorage.setItem("session_id", response.data.session_id);
+            localStorage.setItem("page_version_id", response.data.page_version_id);
         });
+}
+
+function exclude_path(str) {
+    var paths = [];
+    var file = 'exclude.json';
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', chrome.extension.getURL(file), true);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+            paths = JSON.parse(xhr.responseText).data.paths;
+        }
+    };
+    xhr.send();
+
+
+    for (let path of paths) {
+        if (str.indexOf(path) !== -1) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 function appendData() {
     console.log('appending');
-    video.style.display = 'none';
-    faceOverlay.style.display = 'none';
-    if (page_url !== location.origin + location.pathname) {
-        if (page_url !== '') {
-            stopAppending();
-            postData();
-        }
-        eyeData = [];
-        page_url = location.origin + location.pathname;
-        postPageData();
-        visit_time = new Date();
-    }
 
     var prediction = webgazer.getCurrentPrediction();
     if (prediction) {
-
-        gazes = {
-            'timestamp': new Date(),
-            'x': (prediction.x + document.documentElement.scrollLeft) / document.documentElement.scrollWidth,
-            'y': (prediction.y + document.documentElement.scrollTop) / document.documentElement.scrollHeight,
-        };
-
-        console.log(runs);
-        eyeData.push(gazes);
+        gazes = String(new Date()) + ',' + String((prediction.x + document.documentElement.scrollLeft) / document.documentElement.scrollWidth) + ',' + String((prediction.y + document.documentElement.scrollTop) / document.documentElement.scrollHeight);
+        localStorage.setItem(String(runs), gazes);
+        runs++;
     }
 }
 
 function postData() {
     var url = 'chromex/page_views';
+    for (var i = 0; i < runs; i++) {
+        var strData = localStorage.getItem(String(i)).split(',');
+        var json = {
+            'timeStamp': strData[0],
+            'x': strData[1],
+            'y': strData[2],
+        }
+        eyeData.push(json);
+        console.log('push ' + i);
+    }
+
     var postMsg = {
         'token': token,
         'visit_time': visit_time,
-        'session_id': session_id,
-        'page_version_id': page_version_id,
+        'session_id': localStorage.getItem("session_id"),
+        'page_version_id': localStorage.getItem("page_version_id"),
         'gazes': eyeData,
     };
+    console.log('Send ', eyeData.length, ' datas.');
     fetch(URL_INI + url, {
         method: 'POST',
         headers: {
