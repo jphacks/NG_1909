@@ -7,7 +7,7 @@ const router = new VueRouter({
   routes: [
     // Public
     { path: '/', component: TopPage },
-    { path: '/transition', component: Transition },
+    { path: '/domains/:domain_id/transition', component: Transition, props: true  },
     { path: '/heatmap', component: Heatmap },
   ]
 })
