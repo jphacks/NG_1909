@@ -8,6 +8,7 @@ appendLoop = '';
 eyeData = [];
 runs = 0;
 URL_INI = 'https://51312073.ngrok.io/';
+gazeObj = '';
 
 setTimeout(function() {
     initGazer();
@@ -21,14 +22,14 @@ function initGazer() {
         console.log(on);
         if (compatible && on) {
             //start the webgazer tracker
-            webgazer.setRegression('ridge') /* currently must set regression and tracker */
+            gazeObj = webgazer.setRegression('ridge') /* currently must set regression and tracker */
                 .setTracker('clmtrackr')
                 .setGazeListener(function(data, clock) {
                     //   console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
                     //   console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
                 })
                 .begin()
-                .showPredictionPoints(true); /* shows a square every 100 milliseconds where current prediction is */
+                .showPredictionPoints(false); /* shows a square every 100 milliseconds where current prediction is */
             function checkIfReady() {
                 if (webgazer.isReady()) {
                     console.log('ready');
@@ -41,15 +42,15 @@ function initGazer() {
                             if (request.toggleCamera == false) {
                                 sendResponse({ toggleCamera: false });
                                 console.log('off');
-                                document.getElementById('overlay').style.display = 'none';
-                                document.getElementById('faceOverlay').style.display = 'none';
+                                document.getElementById('overlay').style.visibility = 'hidden';
+                                document.getElementById('faceOverlay').hidden = false;
                                 document.getElementById('webgazerVideoFeed').style.display = 'none';
                             } else if (request.toggleCamera == true) {
                                 console.log('on');
                                 sendResponse({ toggleCamera: true });
-                                document.getElementById('faceOverlay').style.display = 'none';
+                                document.getElementById('faceOverlay').style.visibility = 'hidden';
                                 document.getElementById('webgazerVideoFeed').style.display = 'none';
-                                document.getElementById('overlay').style.display = 'none';
+                                document.getElementById('overlay').hidden = false;
                                 setup();
                             }
 
@@ -80,7 +81,7 @@ var setup = function() {
     //Set up video variable to store the camera feedback
     video = document.getElementById('webgazerVideoFeed');
 
-
+    video.style.display = 'none';
     console.log(showCamera);
     //Position the camera feedback to the top left corner.
     video.style.position = 'fixed';
@@ -126,12 +127,13 @@ var setup = function() {
         canvas.style.position = 'fixed';
     */
     var showCamera;
-    chrome.storage.sync.get('showCamera', function(result) {
-        var showCamera = result.showCamera;
-        overlay.hidden = !showCamera;
-        faceOverlay.hidden = !showCamera;
-        //video.style.display = showCamera ? 'block' : 'none';
-    });
+    /*
+        chrome.storage.sync.get('showCamera', function(result) {
+            var showCamera = result.showCamera;
+            overlay.hidden = !showCamera;
+            faceOverlay.hidden = !showCamera;
+            video.style.display = showCamera ? 'block' : 'none';
+        });*/
     var cl = webgazer.getTracker().clm;
 
     //This function draw the face of the user frame.
@@ -168,6 +170,7 @@ var setup = function() {
     localStorage.setItem("runs", String(runs));
 
     setTimeout(appendLoop = setInterval(appendData, 100), 5000);
+    setInterval(getRedgeTrackData, 1000);
 
 }
 
@@ -264,4 +267,9 @@ function postData() {
         body: JSON.stringify(postMsg),
     });
 
+}
+
+function getRedgeTrackData() {
+    console.log(gazeObj.getRegression());
+    console.log(gazeObj.getTracker());
 }
