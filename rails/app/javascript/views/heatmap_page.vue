@@ -5,8 +5,8 @@
     {{ page_views }}
     <p v-text="content"></p>
     <v-select :items="page_versions" item-text="id" item-value="id" @change="changeVersion" label="バージョン"></v-select>
-    </div>
-</div>
+    <img src="/captures/sample-lp2.jpg" alt="" width="70%">
+  </div>
 </template>
 
 <style>
