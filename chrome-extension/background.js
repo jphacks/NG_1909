@@ -12,7 +12,7 @@ chrome.runtime.onInstalled.addListener(function() {
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     switch (request.method) {
         case 'getItem':
-            sendResponse({ data: JSON.parse(localStorage.getItem(request.key)) });
+            sendResponse({ data: localStorage.getItem(request.key) });
             break;
         case 'setItem':
             sendResponse({ data: localStorage.setItem(request.key, request.value) });

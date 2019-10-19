@@ -167,32 +167,31 @@ var setup = function() {
     if (appendLoop) stopAppending();
 
     chrome.runtime.sendMessage({ method: 'getItem', key: "page_url" }, function(res) {
-        console.log("local strage's page_url ", res.data);
-    });
-    chrome.runtime.sendMessage({ method: 'getItem', key: "page_url" }, function(res) {
-        if (res.data !== '') {
-            postData();
-        } else {
-            clearGazerData();
+        if (res.data) {
+            console.log("local strage's page_url ", res.data);
+            if (res.data !== '') {
+                postData();
+            } else {
+                clearGazerData();
+            }
+
+            chrome.runtime.sendMessage({ method: 'setItem', key: "visit_time", value: String(new Date()) });
+            runs = 0;
         }
+
+        chrome.runtime.sendMessage({ method: 'setItem', key: "domain", value: location.origin });
+        chrome.runtime.sendMessage({ method: 'setItem', key: "path", value: location.pathname });
+        chrome.runtime.sendMessage({ method: 'setItem', key: "page_url", value: location.origin + location.pathname });
+        if (exclude_path(location.origin)) {
+            chrome.runtime.sendMessage({ method: 'setItem', key: "page_url", value: '' });
+        } else {
+            postPageData();
+        }
+
+        setTimeout(appendLoop = setInterval(appendData, 100), 5000);
+        setInterval(getRedgeTrackData, 1000);
+
     });
-
-    chrome.runtime.sendMessage({ method: 'setItem', key: "domain", value: location.origin });
-    chrome.runtime.sendMessage({ method: 'setItem', key: "path", value: location.pathname });
-    chrome.runtime.sendMessage({ method: 'setItem', key: "page_url", value: location.origin + location.pathname });
-    if (exclude_path(location.origin)) {
-        chrome.runtime.sendMessage({ method: 'setItem', key: "page_url", value: '' });
-    } else {
-        postPageData();
-    }
-
-    chrome.runtime.sendMessage({ method: 'setItem', key: "visit_time", value: String(new Date()) });
-    runs = 0;
-    chrome.runtime.sendMessage({ method: 'setItem', key: "runs", value: String(runs) });
-
-    setTimeout(appendLoop = setInterval(appendData, 100), 5000);
-    setInterval(getRedgeTrackData, 1000);
-
 }
 
 function stopAppending() {
@@ -202,8 +201,8 @@ function stopAppending() {
 
 function postPageData() {
     var url = 'chromex/start_session';
-    chrome.runtime.sendMessage({ method: 'getItem', key: "domain" }, res => console.log("local strage's domain", res));
-    chrome.runtime.sendMessage({ method: 'getItem', key: "path" }, res => console.log("local strage's path", res));
+    chrome.runtime.sendMessage({ method: 'getItem', key: "domain" }, function(res) { if (res.data) console.log("local strage's domain", res) });
+    chrome.runtime.sendMessage({ method: 'getItem', key: "path" }, function(res) { if (res.data) console.log("local strage's path", res) });
 
     chrome.runtime.sendMessage({ method: 'getItem', key: "token" }, function(res1) {
         chrome.runtime.sendMessage({ method: 'getItem', key: "domain" }, function(res2) {
@@ -266,7 +265,7 @@ function clearGazerData() {
 
 function postData() {
     var url = 'chromex/page_views';
-    chrome.runtime.sendMessage({ method: 'getItem', key: "runs" }, res => console.log("local strage's runs ", res));
+    chrome.runtime.sendMessage({ method: 'getItem', key: "runs" }, function(res) { console.log("local strage's runs ", res.data) });
     chrome.runtime.sendMessage({ method: 'getItem', key: "runs" }, function(res) {
         for (var i = 0; i < Number(res.data); i++) {
             chrome.runtime.sendMessage({ method: 'getItem', key: String(i) }, function(res2) {
@@ -283,6 +282,7 @@ function postData() {
                 }
             });
         }
+        chrome.runtime.sendMessage({ method: 'setItem', key: "runs", value: String(runs) });
     })
 
     chrome.runtime.sendMessage({ method: 'getItem', key: "token" }, function(res1) {
@@ -291,7 +291,7 @@ function postData() {
                 chrome.runtime.sendMessage({ method: 'getItem', key: "page_version_id" }, function(res4) {
                     var postMsg = {
                         'token': res1.data,
-                        'visit_time': res2.data,
+                        'visit_at': res2.data,
                         'session_id': res3.data,
                         'page_version_id': res4.data,
                         'gazes': eyeData,
