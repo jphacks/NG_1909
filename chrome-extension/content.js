@@ -149,23 +149,24 @@ var setup = function() {
     //drawLoop();
     console.log(width, height);
     if (appendLoop) stopAppending();
-    localStorage.setItem("visit_time", String(new Date()));
 
     if (localStorage.getItem("page_url") !== '') {
-        stopAppending();
         postData();
+    } else {
+        clearGazerData();
     }
-    eyeData = [];
-    localStorage.clear();
-    localStorage.setItem("page_url", location.origin + location.pathname);
-    postPageData();
-    if (exclude_path(location.origin)) {
-        localStorage.setItem("page_url", '');
-    }
-    visit_time = new Date();
-    runs = 0;
+
     localStorage.setItem("domain", location.origin);
     localStorage.setItem("path", location.pathname);
+    localStorage.setItem("page_url", location.origin + location.pathname);
+    if (exclude_path(location.origin)) {
+        localStorage.setItem("page_url", '');
+    } else {
+        postPageData();
+    }
+
+    localStorage.setItem("visit_time", String(new Date()));
+    runs = 0;
 
     setTimeout(appendLoop = setInterval(appendData, 100), 5000);
 
@@ -227,13 +228,21 @@ function appendData() {
         gazes = String(new Date()) + ',' + String((prediction.x + document.documentElement.scrollLeft) / document.documentElement.scrollWidth) + ',' + String((prediction.y + document.documentElement.scrollTop) / document.documentElement.scrollHeight);
         localStorage.setItem(String(runs), gazes);
         runs++;
+        localStorage.setItem("runs", String(runs));
+    }
+}
+
+function clearGazerData() {
+    for (var i = 0; i < Number(localStorage.getItem("runs")); i++) {
+        localStorage.removeItem(String(i));
     }
 }
 
 function postData() {
     var url = 'chromex/page_views';
-    for (var i = 0; i < runs; i++) {
+    for (var i = 0; i < Number(localStorage.getItem("runs")); i++) {
         var strData = localStorage.getItem(String(i)).split(',');
+        localStorage.removeItem(String(i));
         var json = {
             'timeStamp': strData[0],
             'x': strData[1],
@@ -258,6 +267,5 @@ function postData() {
         },
         body: JSON.stringify(postMsg),
     });
-
 
 }
