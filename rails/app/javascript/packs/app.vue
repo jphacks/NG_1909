@@ -6,7 +6,6 @@
           <!-- Provides the application the proper gutter -->
           <v-container fluid>
             <!-- If using vue-router -->
-            {{ aaa }}
               <router-view />
           </v-container>
       </v-content>
@@ -23,11 +22,6 @@ export default {
   components: {
     HeaderComponent,
     FooterComponent,
-  },
-  data(){
-    return {
-      aaa: "hello"
-    }
   }
 }
 </script>
