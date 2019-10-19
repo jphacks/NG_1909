@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     {{ page_id }}
+    {{ page_versions }}
     <p v-text="content"></p>
     <div class="flex-row">
         <div class="flex-column" v-for="items in itemss">
@@ -30,6 +31,7 @@
 </style>
 
 <script type="text/javascript">
+import axios from 'axios'
 
 export default {
   props: [
@@ -39,8 +41,14 @@ export default {
     return {
       content:'This is heatmap page',
       item:'',
-      itemss:[[{path: "aa", height: 50}, {path: "bb", height: 10}, {path: "cc", height: 10}], [{path: "dd", height: 10}, {path: "ee", height: 15}, {path: "vv", height: 10}],[{path: "dd", height: 10}, {path: "ee", height: 10}, {path: "vv", height: 0}],[{path: "tt", height: 10}, {path: "pp", height: 10}], [{path: "rr", height: 10}]]
+      itemss:[[{path: "aa", height: 50}, {path: "bb", height: 10}, {path: "cc", height: 10}], [{path: "dd", height: 10}, {path: "ee", height: 15}, {path: "vv", height: 10}],[{path: "dd", height: 10}, {path: "ee", height: 10}, {path: "vv", height: 0}],[{path: "tt", height: 10}, {path: "pp", height: 10}], [{path: "rr", height: 10}]],
+      page_versions: []
     }
+  },
+  created: function(){
+    axios.get(`/forcom/pages/${this.page_id}/page_versions`).then(resp=>{
+      this.page_versions = resp.data.page_versions
+    })
   }
 }
 
