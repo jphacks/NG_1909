@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    {{ page_id }}
     <p v-text="content"></p>
     <div class="flex-row">
         <div class="flex-column" v-for="items in itemss">
@@ -31,6 +32,9 @@
 <script type="text/javascript">
 
 export default {
+  props: [
+    'page_id'
+  ],
   data: function(){
     return {
       content:'This is heatmap page',

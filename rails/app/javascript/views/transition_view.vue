@@ -6,7 +6,7 @@
     <div class="flex-row">
         <div class="flex-column" v-for="items in itemss">
             <div v-for="item in items">
-                <v-btn>{{item.path}}</v-btn>
+                <v-btn @click="$router.push(`/pages/${4}/heatmap`)">{{item.path}}</v-btn> <!-- ここの4をあとで変えて -->
                 <svg width="40" height="20">
 
                 <rect width="40" :height="item.height" style="fill:rgb(100,30,255);"/>
