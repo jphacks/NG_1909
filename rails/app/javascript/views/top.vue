@@ -34,13 +34,19 @@
 
 <script type="text/javascript">
 
+import axios from 'axios'
+
 export default {
   data: function(){
     return {
-      content:'add your urls here:',
-      item:'',
-      items:["aa", "bb", "cc", "nn"]
+      domains:[]
     }
+  },
+  created: function(){
+    axios.get('/forcom/domains').then(resp=>{
+      console.log(resp.data);
+      this.domains = resp.data
+    })
   }
 }
 
