@@ -3,15 +3,12 @@
 	Run webgazer
 
 */
+exclude_paths = ["google.com", "www.yahoo.co.jp"];
 appendLoop = '';
 eyeData = [];
 runs = 0;
-page_url = '';
-token = '';
-session_id = 0;
-page_version_id = 0;
-visit_time = new Date();
 URL_INI = 'https://51312073.ngrok.io/';
+gazeObj = '';
 
 setTimeout(function() {
     initGazer();
@@ -25,14 +22,14 @@ function initGazer() {
         console.log(on);
         if (compatible && on) {
             //start the webgazer tracker
-            webgazer.setRegression('ridge') /* currently must set regression and tracker */
+            gazeObj = webgazer.setRegression('ridge') /* currently must set regression and tracker */
                 .setTracker('clmtrackr')
                 .setGazeListener(function(data, clock) {
                     //   console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
                     //   console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
                 })
                 .begin()
-                .showPredictionPoints(true); /* shows a square every 100 milliseconds where current prediction is */
+                .showPredictionPoints(false); /* shows a square every 100 milliseconds where current prediction is */
             function checkIfReady() {
                 if (webgazer.isReady()) {
                     console.log('ready');
@@ -45,15 +42,15 @@ function initGazer() {
                             if (request.toggleCamera == false) {
                                 sendResponse({ toggleCamera: false });
                                 console.log('off');
-                                document.getElementById('overlay').style.display = 'none';
-                                document.getElementById('faceOverlay').style.display = 'none';
+                                document.getElementById('overlay').style.visibility = 'hidden';
+                                document.getElementById('faceOverlay').hidden = false;
                                 document.getElementById('webgazerVideoFeed').style.display = 'none';
                             } else if (request.toggleCamera == true) {
                                 console.log('on');
                                 sendResponse({ toggleCamera: true });
-                                document.getElementById('faceOverlay').style.display = 'none';
+                                document.getElementById('faceOverlay').style.visibility = 'hidden';
                                 document.getElementById('webgazerVideoFeed').style.display = 'none';
-                                document.getElementById('overlay').style.display = 'none';
+                                document.getElementById('overlay').hidden = false;
                                 setup();
                             }
 
@@ -84,7 +81,7 @@ var setup = function() {
     //Set up video variable to store the camera feedback
     video = document.getElementById('webgazerVideoFeed');
 
-
+    video.style.display = 'none';
     console.log(showCamera);
     //Position the camera feedback to the top left corner.
     video.style.position = 'fixed';
@@ -130,12 +127,13 @@ var setup = function() {
         canvas.style.position = 'fixed';
     */
     var showCamera;
-    chrome.storage.sync.get('showCamera', function(result) {
-        var showCamera = result.showCamera;
-        overlay.hidden = !showCamera;
-        faceOverlay.hidden = !showCamera;
-        //video.style.display = showCamera ? 'block' : 'none';
-    });
+    /*
+        chrome.storage.sync.get('showCamera', function(result) {
+            var showCamera = result.showCamera;
+            overlay.hidden = !showCamera;
+            faceOverlay.hidden = !showCamera;
+            video.style.display = showCamera ? 'block' : 'none';
+        });*/
     var cl = webgazer.getTracker().clm;
 
     //This function draw the face of the user frame.
@@ -150,10 +148,10 @@ var setup = function() {
     console.log(width, height);
     if (appendLoop) stopAppending();
 
+    console.log("local strage's page_url ", localStorage.getItem("page_url"));
     if (localStorage.getItem("page_url") !== '') {
-        if (!localStorage.getItem("0")) {
-            postData();
-        }
+        postData();
+
     } else {
         clearGazerData();
     }
@@ -172,6 +170,7 @@ var setup = function() {
     localStorage.setItem("runs", String(runs));
 
     setTimeout(appendLoop = setInterval(appendData, 100), 5000);
+    setInterval(getRedgeTrackData, 1000);
 
 }
 
@@ -182,8 +181,10 @@ function stopAppending() {
 
 function postPageData() {
     var url = 'chromex/start_session';
+    console.log("local strage's domain", localStorage.getItem("domain"));
+    console.log("local strage's path", localStorage.getItem("path"));
     var postData = {
-        'token': token,
+        'token': localStorage.getItem("token"),
         'domain': localStorage.getItem("domain"),
         'path': localStorage.getItem("path"),
     };
@@ -202,19 +203,8 @@ function postPageData() {
 }
 
 function exclude_path(str) {
-    var paths = [];
-    var file = 'exclude.json';
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', chrome.extension.getURL(file), true);
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-            paths = JSON.parse(xhr.responseText).data.paths;
-        }
-    };
-    xhr.send();
 
-
-    for (let path of paths) {
+    for (let path of exclude_paths) {
         if (str.indexOf(path) !== -1) {
             return true;
         }
@@ -224,10 +214,10 @@ function exclude_path(str) {
 }
 
 function appendData() {
-    console.log('appending');
-
     var prediction = webgazer.getCurrentPrediction();
+    console.log("prediction", prediction);
     if (prediction) {
+        console.log('appending');
         gazes = String(new Date()) + ',' + String((prediction.x + document.documentElement.scrollLeft) / document.documentElement.scrollWidth) + ',' + String((prediction.y + document.documentElement.scrollTop) / document.documentElement.scrollHeight);
         localStorage.setItem(String(runs), gazes);
         runs++;
@@ -245,6 +235,7 @@ function clearGazerData() {
 
 function postData() {
     var url = 'chromex/page_views';
+    console.log("local strage's runs ", localStorage.getItem("runs"));
     for (var i = 0; i < Number(localStorage.getItem("runs")); i++) {
         var str = localStorage.getItem(String(i));
         if (str) {
@@ -256,13 +247,13 @@ function postData() {
                 'y': strData[2],
             }
             eyeData.push(json);
-            console.log('push ' + i);
+            console.log('maked json[', i, "]", json);
         }
     }
 
     var postMsg = {
-        'token': token,
-        'visit_time': visit_time,
+        'token': localStorage.getItem("token"),
+        'visit_time': localStorage.getItem("visit_time"),
         'session_id': localStorage.getItem("session_id"),
         'page_version_id': localStorage.getItem("page_version_id"),
         'gazes': eyeData,
@@ -276,4 +267,9 @@ function postData() {
         body: JSON.stringify(postMsg),
     });
 
+}
+
+function getRedgeTrackData() {
+    console.log(gazeObj.getRegression());
+    console.log(gazeObj.getTracker());
 }
