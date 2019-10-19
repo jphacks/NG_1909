@@ -151,7 +151,9 @@ var setup = function() {
     if (appendLoop) stopAppending();
 
     if (localStorage.getItem("page_url") !== '') {
-        postData();
+        if (!localStorage.getItem("0")) {
+            postData();
+        }
     } else {
         clearGazerData();
     }
@@ -167,6 +169,7 @@ var setup = function() {
 
     localStorage.setItem("visit_time", String(new Date()));
     runs = 0;
+    localStorage.setItem("runs", String(runs));
 
     setTimeout(appendLoop = setInterval(appendData, 100), 5000);
 
@@ -228,7 +231,9 @@ function appendData() {
         gazes = String(new Date()) + ',' + String((prediction.x + document.documentElement.scrollLeft) / document.documentElement.scrollWidth) + ',' + String((prediction.y + document.documentElement.scrollTop) / document.documentElement.scrollHeight);
         localStorage.setItem(String(runs), gazes);
         runs++;
-        localStorage.setItem("runs", String(runs));
+        if (runs > 50) {
+            localStorage.setItem("runs", String(runs));
+        }
     }
 }
 
@@ -241,15 +246,18 @@ function clearGazerData() {
 function postData() {
     var url = 'chromex/page_views';
     for (var i = 0; i < Number(localStorage.getItem("runs")); i++) {
-        var strData = localStorage.getItem(String(i)).split(',');
-        localStorage.removeItem(String(i));
-        var json = {
-            'timeStamp': strData[0],
-            'x': strData[1],
-            'y': strData[2],
+        var str = localStorage.getItem(String(i));
+        if (str) {
+            var strData = str.split(',');
+            localStorage.removeItem(String(i));
+            var json = {
+                'timeStamp': strData[0],
+                'x': strData[1],
+                'y': strData[2],
+            }
+            eyeData.push(json);
+            console.log('push ' + i);
         }
-        eyeData.push(json);
-        console.log('push ' + i);
     }
 
     var postMsg = {
