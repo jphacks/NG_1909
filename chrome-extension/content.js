@@ -3,6 +3,7 @@
 	Run webgazer
 
 */
+exclude_paths = ["google.com", "www.yahoo.co.jp"];
 appendLoop = '';
 eyeData = [];
 runs = 0;
@@ -152,9 +153,8 @@ var setup = function() {
 
     console.log("local strage's page_url ", localStorage.getItem("page_url"));
     if (localStorage.getItem("page_url") !== '') {
-        if (!localStorage.getItem("0")) {
-            postData();
-        }
+        postData();
+
     } else {
         clearGazerData();
     }
@@ -184,7 +184,7 @@ function stopAppending() {
 function postPageData() {
     var url = 'chromex/start_session';
     console.log("local strage's domain", localStorage.getItem("domain"));
-    console.log("local strage's path", localStorage.getItem("domain"));
+    console.log("local strage's path", localStorage.getItem("path"));
     var postData = {
         'token': token,
         'domain': localStorage.getItem("domain"),
@@ -205,19 +205,8 @@ function postPageData() {
 }
 
 function exclude_path(str) {
-    var paths = [];
-    var file = 'exclude.json';
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', chrome.extension.getURL(file), true);
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
-            paths = JSON.parse(xhr.responseText).data.paths;
-        }
-    };
-    xhr.send();
 
-
-    for (let path of paths) {
+    for (let path of exclude_paths) {
         if (str.indexOf(path) !== -1) {
             return true;
         }
@@ -227,10 +216,9 @@ function exclude_path(str) {
 }
 
 function appendData() {
-    console.log('appending');
-
     var prediction = webgazer.getCurrentPrediction();
     if (prediction) {
+        console.log('appending');
         gazes = String(new Date()) + ',' + String((prediction.x + document.documentElement.scrollLeft) / document.documentElement.scrollWidth) + ',' + String((prediction.y + document.documentElement.scrollTop) / document.documentElement.scrollHeight);
         localStorage.setItem(String(runs), gazes);
         runs++;
