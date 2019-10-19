@@ -9,7 +9,7 @@
 export default {
   data: function(){
     return {
-      aa: "aaあああ"
+      aa: "test"
     }
   }
 }
