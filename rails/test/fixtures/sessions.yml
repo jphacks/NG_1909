@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  domain: one
+  device_kind: MyString
+  device_width: 1.5
+  device_height: 1.5
+
+two:
+  user: two
+  domain: two
+  device_kind: MyString
+  device_width: 1.5
+  device_height: 1.5
