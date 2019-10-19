@@ -10,7 +10,8 @@ class Chromex::ChromexController < ApplicationController
     # session_idとpage_version_idを返す
     session = Session.find_or_create_by_user_and_domain( user, domain )
     page_version = PageVersion.find_or_create_by_page(page)
-    render json: { session_id: session.id, page_version_id: page_version.id }, state: 'SUCCESS', message: 'successfully get'
+    render json: { status: 'SUCCESS', message: 'success', data: { session_id: session.id, page_version_id: page_version.id } }
+  end
 
   def create_page_views
     page = PageView.create(page_view_params)
