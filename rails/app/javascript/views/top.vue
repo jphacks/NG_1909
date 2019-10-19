@@ -1,15 +1,45 @@
 <template>
   <div id="app">
-    {{aa}}
+
+    <div class="url-container">
+      select your domains
+      </select>
+      <br>
+        <v-btn class="url_buttons" v-for="todo in items" @click="$router.push('/transition')">{{todo}}</v-btn>
+    </div>
   </div>
 </template>
+
+<style>
+.url-container {
+  width: 50%;
+  min-width: 300px;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+}
+
+.url_buttons {
+  background: LightGray;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  margin-top: 4px;
+  font-weight: lighter;
+}
+
+
+</style>
 
 <script type="text/javascript">
 
 export default {
   data: function(){
     return {
-      aa: "aaあああ"
+      content:'add your urls here:',
+      item:'',
+      items:["aa", "bb", "cc", "nn"]
     }
   }
 }

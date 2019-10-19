@@ -1,17 +1,14 @@
 import VueRouter from 'vue-router';
 import TopPage from 'views/top'
+import Transition from 'views/transition_view'
+import Heatmap from 'views/heatmap_page'
 
 const router = new VueRouter({
-  mode: "history",
   routes: [
     // Public
     { path: '/', component: TopPage },
+    { path: '/transition', component: Transition },
+    { path: '/heatmap', component: Heatmap },
   ]
 })
-
-// router.beforeEach((to, from, next) => {
-  // authentication周り
-// });
-
-
 export default router;
