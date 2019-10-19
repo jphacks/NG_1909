@@ -1,5 +1,7 @@
 class Domain < ApplicationRecord
 
+  has_many :pages
+
   before_save :set_root_domain
   def set_root_domain
     splited = self.all_domain.split(".")
