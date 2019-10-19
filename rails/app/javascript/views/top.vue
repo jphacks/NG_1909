@@ -5,7 +5,7 @@
       select your domains
       </select>
       <br>
-        <v-btn class="url_buttons" v-for="todo in items">{{todo}}</v-btn>
+        <v-btn class="url_buttons" v-for="todo in items" @click="$router.push('/transition')">{{todo}}</v-btn>
     </div>
   </div>
 </template>
