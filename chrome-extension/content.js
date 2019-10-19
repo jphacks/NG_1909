@@ -7,11 +7,6 @@ exclude_paths = ["google.com", "www.yahoo.co.jp"];
 appendLoop = '';
 eyeData = [];
 runs = 0;
-page_url = '';
-token = '';
-session_id = 0;
-page_version_id = 0;
-visit_time = new Date();
 URL_INI = 'https://51312073.ngrok.io/';
 
 setTimeout(function() {
@@ -186,7 +181,7 @@ function postPageData() {
     console.log("local strage's domain", localStorage.getItem("domain"));
     console.log("local strage's path", localStorage.getItem("path"));
     var postData = {
-        'token': token,
+        'token': localStorage.getItem("token"),
         'domain': localStorage.getItem("domain"),
         'path': localStorage.getItem("path"),
     };
@@ -217,6 +212,7 @@ function exclude_path(str) {
 
 function appendData() {
     var prediction = webgazer.getCurrentPrediction();
+    console.log("prediction", prediction);
     if (prediction) {
         console.log('appending');
         gazes = String(new Date()) + ',' + String((prediction.x + document.documentElement.scrollLeft) / document.documentElement.scrollWidth) + ',' + String((prediction.y + document.documentElement.scrollTop) / document.documentElement.scrollHeight);
@@ -253,8 +249,8 @@ function postData() {
     }
 
     var postMsg = {
-        'token': token,
-        'visit_time': visit_time,
+        'token': localStorage.getItem("token"),
+        'visit_time': localStorage.getItem("visit_time"),
         'session_id': localStorage.getItem("session_id"),
         'page_version_id': localStorage.getItem("page_version_id"),
         'gazes': eyeData,
