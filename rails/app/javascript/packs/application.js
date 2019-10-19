@@ -18,10 +18,12 @@
 console.log('Hello World from Webpacker')
 import Vue from 'vue';
 import App from './app.vue';
+import vuetify from '../plugins/vuetify'
 
 document.addEventListener('DOMContentLoaded', () => {
   new Vue({
     el: '#application',
+    vuetify,
     render: (h) => h(App),
   });
 });
