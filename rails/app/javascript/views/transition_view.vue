@@ -51,9 +51,6 @@ export default {
       console.log(resp.data);
       this.page_views = resp.data.page_views
     })
-    // axios.get(`/forcom/pages/4/page_versions`).then(resp=>{
-    //   console.log(resp);
-    // })
   }
 }
 
