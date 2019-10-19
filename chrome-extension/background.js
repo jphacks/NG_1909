@@ -14,8 +14,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         case 'getItem':
             sendResponse({ data: localStorage.getItem(request.key) });
             break;
+        case 'getJSON':
+            sendResponse({ data: JSON.parse(localStorage.getItem(request.key)) });
+            break;
         case 'setItem':
             sendResponse({ data: localStorage.setItem(request.key, request.value) });
+            break;
+        case 'setJSON':
+            sendResponse({ data: localStorage.setItem(request.key, JSON.stringify(request.value)) });
             break;
         case 'removeItem':
             sendResponse({ data: localStorage.removeItem[request.key] });

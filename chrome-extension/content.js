@@ -4,6 +4,7 @@
 
 */
 exclude_paths = ["google.com", "www.yahoo.co.jp"];
+calib_path = "";
 appendLoop = '';
 eyeData = [];
 runs = 0;
@@ -24,13 +25,13 @@ function initGazer() {
             //start the webgazer tracker
             var ridge = '';
             var clmtrackr = '';
-            chrome.runtime.sendMessage({ method: 'getItem', key: 'redge' }, function(res) {
+            chrome.runtime.sendMessage({ method: 'getJSON', key: 'redge' }, function(res) {
                 if (res.data) {
                     ridge = res.data;
                 } else {
                     ridge = 'ridge';
                 }
-                chrome.runtime.sendMessage({ method: 'getItem', key: 'clmtrackr' }, function(response) {
+                chrome.runtime.sendMessage({ method: 'getJSON', key: 'clmtrackr' }, function(response) {
                     if (response.data) {
                         clmtrackr = response.data;
                     } else {
@@ -223,11 +224,32 @@ function postPageData() {
                     .then(function(response) {
                         chrome.runtime.sendMessage({ method: 'setItem', key: "session_id", value: response.data.session_id });
                         chrome.runtime.sendMessage({ method: 'setItem', key: "page_version_id", value: response.data.page_version_id });
+                        if (response.data.) {
+                            sendPageCapture();
+                        }
                     });
             })
         })
     })
 
+}
+
+function sendPageCapture() {
+    html2canvas(document.body, {
+        onrendered: function(canvas) {
+            var url = '';
+            const imgData = canvas.toDataURL("image/png");
+            var fd = new FormData();
+            fd.append(location.origin + location.pathname, imgData);
+            fetch(URL_INI + url, {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: fd,
+            });
+        }
+    })
 }
 
 function exclude_path(str) {
@@ -311,12 +333,12 @@ function postData() {
 }
 
 function getRedgeTrackData() {
-    chrome.runtime.sendMessage({ method: 'getItem', key: 'ridge' }, function(res) {
+    chrome.runtime.sendMessage({ method: 'getJSON', key: 'ridge' }, function(res) {
         if (res.data) {
             gazeObj.setRegression(res.data);
         }
     });
-    chrome.runtime.sendMessage({ method: 'getItem', key: 'clmtrackr' }, function(res) {
+    chrome.runtime.sendMessage({ method: 'getJSON', key: 'clmtrackr' }, function(res) {
         if (res.data) {
             gazeObj.setTracker(res.data);
         }
