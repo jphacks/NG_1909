@@ -1,5 +1,6 @@
 class PageVersion < ApplicationRecord
   belongs_to :page
+  has_many :page_views
 
   def self.find_or_create_by_page(page)
     page_version = page.page_versions.last
