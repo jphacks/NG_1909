@@ -22,14 +22,32 @@ function initGazer() {
         console.log(on);
         if (compatible && on) {
             //start the webgazer tracker
-            gazeObj = webgazer.setRegression('ridge') /* currently must set regression and tracker */
-                .setTracker('clmtrackr')
-                .setGazeListener(function(data, clock) {
-                    //   console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
-                    //   console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
-                })
-                .begin()
-                .showPredictionPoints(false); /* shows a square every 100 milliseconds where current prediction is */
+            var ridge = '';
+            var clmtrackr = '';
+            chrome.runtime.sendMessage({ method: getItem, key: 'redge' }, function(res) {
+                if (res.data) {
+                    ridge = res.data;
+                } else {
+                    ridge = 'ridge';
+                }
+                chrome.runtime.sendMessage({ method: getItem, key: 'clmtrackr' }, function(response) {
+                    if (response.data) {
+                        clmtrackr = response.data;
+                    } else {
+                        clmtrackr = 'clmtrackr';
+                    }
+
+                    gazeObj = webgazer.setRegression(ridge) /* currently must set regression and tracker */
+                        .setTracker(clmtrackr)
+                        .setGazeListener(function(data, clock) {
+                            //   console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
+                            //   console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
+                        })
+                        .begin()
+                        .showPredictionPoints(false); /* shows a square every 100 milliseconds where current prediction is */
+                });
+            });
+
             function checkIfReady() {
                 if (webgazer.isReady()) {
                     console.log('ready');
@@ -148,26 +166,29 @@ var setup = function() {
     console.log(width, height);
     if (appendLoop) stopAppending();
 
-    console.log("local strage's page_url ", localStorage.getItem("page_url"));
-    if (localStorage.getItem("page_url") !== '') {
-        postData();
+    chrome.runtime.sendMessage({ method: getItem, key: "page_url" }, function(res) {
+        console.log("local strage's page_url ", res.data);
+    });
+    chrome.runtime.sendMessage({ method: getItem, key: "page_url" }, function(res) {
+        if (res.data !== '') {
+            postData();
+        } else {
+            clearGazerData();
+        }
+    });
 
-    } else {
-        clearGazerData();
-    }
-
-    localStorage.setItem("domain", location.origin);
-    localStorage.setItem("path", location.pathname);
-    localStorage.setItem("page_url", location.origin + location.pathname);
+    chrome.runtime.sendMessage({ method: setItem, key: "domain", value: location.origin });
+    chrome.runtime.sendMessage({ method: setItem, key: "path", value: location.pathname });
+    chrome.runtime.sendMessage({ method: setItem, key: "page_url", value: location.origin + location.pathname });
     if (exclude_path(location.origin)) {
-        localStorage.setItem("page_url", '');
+        chrome.runtime.sendMessage({ method: setItem, key: "page_url", value: '' });
     } else {
         postPageData();
     }
 
-    localStorage.setItem("visit_time", String(new Date()));
+    chrome.runtime.sendMessage({ method: setItem, key: "visit_time", value: String(new Date()) });
     runs = 0;
-    localStorage.setItem("runs", String(runs));
+    chrome.runtime.sendMessage({ method: setItem, key: "runs", value: String(runs) });
 
     setTimeout(appendLoop = setInterval(appendData, 100), 5000);
     setInterval(getRedgeTrackData, 1000);
@@ -181,25 +202,33 @@ function stopAppending() {
 
 function postPageData() {
     var url = 'chromex/start_session';
-    console.log("local strage's domain", localStorage.getItem("domain"));
-    console.log("local strage's path", localStorage.getItem("path"));
-    var postData = {
-        'token': localStorage.getItem("token"),
-        'domain': localStorage.getItem("domain"),
-        'path': localStorage.getItem("path"),
-    };
+    chrome.runtime.sendMessage({ method: getItem, key: "domain" }, res => console.log("local strage's domain", res));
+    chrome.runtime.sendMessage({ method: getItem, key: "path" }, res => console.log("local strage's path", res));
 
-    fetch(URL_INI + url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(postData),
-        }).then(res => res.json())
-        .then(function(response) {
-            localStorage.setItem("session_id", response.data.session_id);
-            localStorage.setItem("page_version_id", response.data.page_version_id);
-        });
+    chrome.runtime.sendMessage({ method: getItem, key: "token" }, function(res1) {
+        chrome.runtime.sendMessage({ method: getItem, key: "domain" }, function(res2) {
+            chrome.runtime.sendMessage({ method: getItem, key: "path" }, function(res3) {
+                var postData = {
+                    'token': res1.data,
+                    'domain': res2.data,
+                    'path': res3.data,
+                };
+
+                fetch(URL_INI + url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(postData),
+                    }).then(res => res.json())
+                    .then(function(response) {
+                        chrome.runtime.sendMessage({ method: setItem, key: "session_id", value: response.data.session_id });
+                        chrome.runtime.sendMessage({ method: setItem, key: "page_version_id", value: response.data.page_version_id });
+                    });
+            })
+        })
+    })
+
 }
 
 function exclude_path(str) {
@@ -219,57 +248,77 @@ function appendData() {
     if (prediction) {
         console.log('appending');
         gazes = String(new Date()) + ',' + String((prediction.x + document.documentElement.scrollLeft) / document.documentElement.scrollWidth) + ',' + String((prediction.y + document.documentElement.scrollTop) / document.documentElement.scrollHeight);
-        localStorage.setItem(String(runs), gazes);
+        chrome.runtime.sendMessage({ method: setItem, key: (String(runs)), value: gazes });
         runs++;
         if (runs > 50) {
-            localStorage.setItem("runs", String(runs));
+            chrome.runtime.sendMessage({ method: setItem, key: "runs", value: String(runs) });
         }
     }
 }
 
 function clearGazerData() {
-    for (var i = 0; i < Number(localStorage.getItem("runs")); i++) {
-        localStorage.removeItem(String(i));
-    }
+    chrome.runtime.sendMessage({ method: getItem, key: "runs" }, function(res) {
+        for (var i = 0; i < Number(res.data); i++) {
+            chrome.runtime.sendMessage({ method: removeItem, key: String(i) });
+        }
+    })
 }
 
 function postData() {
     var url = 'chromex/page_views';
-    console.log("local strage's runs ", localStorage.getItem("runs"));
-    for (var i = 0; i < Number(localStorage.getItem("runs")); i++) {
-        var str = localStorage.getItem(String(i));
-        if (str) {
-            var strData = str.split(',');
-            localStorage.removeItem(String(i));
-            var json = {
-                'timeStamp': strData[0],
-                'x': strData[1],
-                'y': strData[2],
-            }
-            eyeData.push(json);
-            console.log('maked json[', i, "]", json);
+    chrome.runtime.sendMessage({ method: getItem, key: "runs" }, res => console.log("local strage's runs ", res));
+    chrome.runtime.sendMessage({ method: getItem, key: "runs" }, function(res) {
+        for (var i = 0; i < Number(res.data); i++) {
+            chrome.runtime.sendMessage({ method: getItem, key: String(i) }, function(res2) {
+                if (res2.data) {
+                    var strData = res2.data.split(',');
+                    chrome.runtime.sendMessage({ method: removeItem, key: String(i) });
+                    var json = {
+                        'timeStamp': strData[0],
+                        'x': strData[1],
+                        'y': strData[2],
+                    }
+                    eyeData.push(json);
+                    console.log('maked json[', i, "]", json);
+                }
+            });
         }
-    }
+    })
 
-    var postMsg = {
-        'token': localStorage.getItem("token"),
-        'visit_time': localStorage.getItem("visit_time"),
-        'session_id': localStorage.getItem("session_id"),
-        'page_version_id': localStorage.getItem("page_version_id"),
-        'gazes': eyeData,
-    };
-    console.log('Send ', eyeData.length, ' datas.');
-    fetch(URL_INI + url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(postMsg),
-    });
-
+    chrome.runtime.sendMessage({ method: getItem, key: "token" }, function(res1) {
+        chrome.runtime.sendMessage({ method: getItem, key: "visit_time" }, function(res2) {
+            chrome.runtime.sendMessage({ method: getItem, key: "session_id" }, function(res3) {
+                chrome.runtime.sendMessage({ method: getItem, key: "page_version_id" }, function(res4) {
+                    var postMsg = {
+                        'token': res1.data,
+                        'visit_time': res2.data,
+                        'session_id': res3.data,
+                        'page_version_id': res4.data,
+                        'gazes': eyeData,
+                    };
+                    console.log('Send ', eyeData.length, ' datas.');
+                    fetch(URL_INI + url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(postMsg),
+                    });
+                })
+            })
+        })
+    })
 }
 
 function getRedgeTrackData() {
-    console.log(gazeObj.getRegression());
-    console.log(gazeObj.getTracker());
+    chrome.runtime.sendMessage({ method: getItem, key: 'ridge' }, function(res) {
+        if (res.data) {
+            gazeObj.setRegression(res.data);
+        }
+    });
+    chrome.runtime.sendMessage({ method: getItem, key: 'clmtrackr' }, function(res) {
+        if (res.data) {
+            gazeObj.setTracker(res.data);
+        }
+    });
 }
