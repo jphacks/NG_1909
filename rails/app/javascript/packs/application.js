@@ -16,3 +16,19 @@
 // const imagePath = (name) => images(name, true)
 
 console.log('Hello World from Webpacker')
+import Vue from 'vue';
+import App from './app.vue';
+import vuetify from '../plugins/vuetify'
+import VueRouter from 'vue-router';
+import router from '../routes';
+
+Vue.use(VueRouter);
+
+document.addEventListener('DOMContentLoaded', () => {
+  new Vue({
+    el: '#application',
+    vuetify,
+    router,
+    render: (h) => h(App),
+  });
+});
