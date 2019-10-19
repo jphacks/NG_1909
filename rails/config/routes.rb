@@ -5,6 +5,6 @@ Rails.application.routes.draw do
 
   namespace :chromex do
     post 'start_session' => 'chromex#start_session'
-    # post 'page_views/' 
+    post 'page_views/'  => 'chromex#create_page_views'
   end
 end

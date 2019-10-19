@@ -11,5 +11,19 @@ class Chromex::ChromexController < ApplicationController
     session = Session.find_or_create_by_user_and_domain( user, domain )
     page_version = PageVersion.find_or_create_by_page(page)
     render json: { session_id: session.id, page_version_id: page_version.id }, state: 'SUCCESS', message: 'successfully get'
+
+  def create_page_views
+    page = PageView.create(page_view_params)
+    p "============"
+    p page.errors
+    p "============"
+    render json: { result: "SUCCESS" }, state: 'SUCCESS', message: 'successfully get'
+  end
+
+  private
+  def page_view_params
+    params.permit(
+      :session_id, :page_version_id, :visit_at, gazes: [:timeStamp, :x, :y]
+    )
   end
 end
