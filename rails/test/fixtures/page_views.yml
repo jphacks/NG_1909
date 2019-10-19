@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  session: one
+  page_version: one
+  next_page_version: 
+  visit_at: 2019-10-19 04:52:26
+  gazes: 
+
+two:
+  session: two
+  page_version: two
+  next_page_version: 
+  visit_at: 2019-10-19 04:52:26
+  gazes: 
