@@ -1,0 +1,55 @@
+version: '2'
+
+volumes:
+  mysql-db:
+    driver: local
+  redis-db:
+    driver: local
+
+# postgresを起こす
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+
+  # rails sを実行
+  app:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec foreman start -f Procfile.dev"
+    volumes:
+      - .:/app_name
+    ports:
+      - "3000:3000"
+      - "3035:3035"
+    depends_on:
+      - db
+      # - redis
+    environment:
+      - RAILS_ENV=development
+      - REDIS_URL=redis://redis:6379
+      - WEBPACKER_DEV_SERVER_HOST=0.0.0.0
+    tty: true
+    stdin_open: true
+
+  # # redisを起こす
+  # redis:
+  #   image: redis:4.0
+  #   volumes:
+  #     - redis-db:/data/redis
+  #   command: redis-server --appendonly yes
+  #
+  # # sidekiq自体を走らせる
+  # worker:
+  #   build: .
+  #   environment:
+  #     - RAILS_ENV=development
+  #     - REDIS_URL=redis://redis:6379
+  #   volumes:
+  #     - .:/job_tree_japan
+  #   depends_on:
+  #     - db
+  #     - redis
+  #   command: bundle exec sidekiq -C config/sidekiq.yml
+  #   tty: true
+  #   stdin_open: true
