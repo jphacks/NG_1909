@@ -7,7 +7,8 @@ class Forcom::PageViewsController < ApplicationController
   end
 
   def index_by_page_version
-    
+    page_views = PageView.by_page_version_id(params[:page_version_id])
+    render json: {page_views: page_views}, state: 'SUCCESS', message: 'successfully get page_views'
   end
 
 end
