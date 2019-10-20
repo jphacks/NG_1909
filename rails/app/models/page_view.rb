@@ -3,6 +3,8 @@ class PageView < ApplicationRecord
   belongs_to :page_version
   belongs_to :next_page_view, foreign_key: { to_table: :page_views }, required: false
 
+  has_one :page, through: :page_version
+
   after_create :set_last_page_view_next_page_view
   def set_last_page_view_next_page_view
     p "呼ばれた"
