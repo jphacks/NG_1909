@@ -31,12 +31,12 @@ ActiveRecord::Schema.define(version: 2019_10_19_045226) do
   create_table "page_views", force: :cascade do |t|
     t.integer "session_id"
     t.integer "page_version_id"
-    t.integer "next_page_version_id"
+    t.integer "next_page_view_id"
     t.datetime "visit_at"
     t.json "gazes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["next_page_version_id"], name: "index_page_views_on_next_page_version_id"
+    t.index ["next_page_view_id"], name: "index_page_views_on_next_page_view_id"
     t.index ["page_version_id"], name: "index_page_views_on_page_version_id"
     t.index ["session_id"], name: "index_page_views_on_session_id"
   end

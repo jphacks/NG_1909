@@ -2,6 +2,8 @@ class Session < ApplicationRecord
   belongs_to :user
   belongs_to :domain
 
+  has_many :page_views
+
   scope :latest_session, -> (user_id, domain_id) {
     where(user_id: user_id).
     where(domain_id: domain_id).
