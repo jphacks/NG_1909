@@ -8,7 +8,7 @@ calib_path = "";
 appendLoop = '';
 eyeData = [];
 runs = 0;
-URL_INI = 'https://51312073.ngrok.io/';
+URL_INI = 'https://c0c796c0.ngrok.io/';
 gazeObj = '';
 
 setTimeout(function() {
@@ -70,7 +70,7 @@ function initGazer() {
                                 document.getElementById('faceOverlay').style.visibility = 'hidden';
                                 document.getElementById('webgazerVideoFeed').style.display = 'none';
                                 document.getElementById('overlay').hidden = false;
-                                if (calib_path !== (location.host + location.path)) {
+                                if (true /*calib_path !== (location.host + location.path)デモ用*/ ) {
                                     document.getElementById('overlay').hidden = true;
                                 }
                                 setup();
@@ -130,7 +130,7 @@ var setup = function() {
     overlay.style.left = leftDist;
     overlay.style.margin = '0px';
     overlay.style.display = 'none';
-    if (calib_path === (location.host + location.path)) {
+    if (true /*calib_path === (location.host + location.path)デモ用*/ ) {
         overlay.style.display = 'block';
     }
 
@@ -234,7 +234,7 @@ function postPageData() {
                     .then(function(response) {
                         chrome.runtime.sendMessage({ method: 'setItem', key: "session_id", value: response.data.session_id });
                         chrome.runtime.sendMessage({ method: 'setItem', key: "page_version_id", value: response.data.page_version_id });
-                        if ( /*response.data.*/ true) {
+                        if ( /*response.data.*/ false) {
                             sendPageCapture(response.data.page_version_id);
                         }
                     });
