@@ -70,7 +70,7 @@ function initGazer() {
                                 document.getElementById('faceOverlay').style.visibility = 'hidden';
                                 document.getElementById('webgazerVideoFeed').style.display = 'none';
                                 document.getElementById('overlay').hidden = false;
-                                if (calib_path !== (document.origin + document.path)) {
+                                if (calib_path !== (location.host + location.path)) {
                                     document.getElementById('overlay').hidden = true;
                                 }
                                 setup();
@@ -130,7 +130,7 @@ var setup = function() {
     overlay.style.left = leftDist;
     overlay.style.margin = '0px';
     overlay.style.display = 'none';
-    if (calib_path === (document.origin + document.path)) {
+    if (calib_path === (location.host + location.path)) {
         overlay.style.display = 'block';
     }
 
@@ -186,17 +186,17 @@ var setup = function() {
             runs = 0;
         }
 
-        chrome.runtime.sendMessage({ method: 'setItem', key: "domain", value: location.origin });
+        chrome.runtime.sendMessage({ method: 'setItem', key: "domain", value: location.host });
         chrome.runtime.sendMessage({ method: 'setItem', key: "path", value: location.pathname });
-        chrome.runtime.sendMessage({ method: 'setItem', key: "page_url", value: location.origin + location.pathname });
-        if (exclude_path(location.origin)) {
+        chrome.runtime.sendMessage({ method: 'setItem', key: "page_url", value: location.host + location.pathname });
+        if (exclude_path(location.host)) {
             chrome.runtime.sendMessage({ method: 'setItem', key: "page_url", value: '' });
         } else {
             postPageData();
         }
 
         setTimeout(appendLoop = setInterval(appendData, 100), 5000);
-        if (calib_path !== (document.origin + document.path)) {
+        if (calib_path !== (location.host + location.path)) {
             setInterval(getRedgeTrackData, 1000);
         } else {
             setInterval(saveRedgeTrackData, 1000);
