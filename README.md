@@ -46,7 +46,8 @@ EyeSightで集まるデータは端的に言うと「どんなレイアウトで
 * そのデータを企業へ売り、利益を得るというビジネスモデルが成り立つ
 
 ## 開発内容・開発技術
-### chrome extension, javascript, 
+
+chrome extension, javascript, 
 https://drive.google.com/file/d/1rk8FvU4Amk0XbJ8Yf26nk0-DogJ2pG7G/view?usp=sharing
 
 ### 活用した技術
@@ -54,16 +55,25 @@ https://drive.google.com/file/d/1rk8FvU4Amk0XbJ8Yf26nk0-DogJ2pG7G/view?usp=shari
 
 
 #### フレームワーク・ライブラリ・モジュール
-* Rails 
-* Vue.js
-* webgazer.js
+* 目線の取得
+  * ChromeExtension
+  * webgazer.js
+* 企業さまの管理画面
+  * Vue.js
+* バックエンド
+  * Rails 
 
 #### デバイス
 * PC
+(将来的には「ブラウジングするだけでお金が溜まるWEBブラウザ」をiPhoneやAndroid向けに開発することでスマホ向けのデザインについてもできるとは考えている)
 
 ### 研究内容・事前開発プロダクト（任意）
-
+特になし
 
 ### 独自開発技術（Hack Dayで開発したもの）
 #### 2日間に開発した独自の機能・技術
-* 従来までは画面のどこを見ているかを検出するものしか存在しなかったが, 我々はそれを改良してwebページ上でどこを見ているかを検出できる技術を新たに作った
+* 目線の取得
+* 目線データ等を保存するAPI
+* 目線のデータをヒートマップで表示
+* コンバージョンしたかによるフィルタ機能 
+* デザインが変わった時のバージョン管理機能
