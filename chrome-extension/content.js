@@ -224,8 +224,8 @@ function postPageData() {
                     .then(function(response) {
                         chrome.runtime.sendMessage({ method: 'setItem', key: "session_id", value: response.data.session_id });
                         chrome.runtime.sendMessage({ method: 'setItem', key: "page_version_id", value: response.data.page_version_id });
-                        if (response.data.) {
-                            sendPageCapture();
+                        if ( /*response.data.*/ true) {
+                            sendPageCapture(response.data.page_version_id);
                         }
                     });
             })
@@ -234,22 +234,50 @@ function postPageData() {
 
 }
 
-function sendPageCapture() {
-    html2canvas(document.body, {
-        onrendered: function(canvas) {
-            var url = '';
-            const imgData = canvas.toDataURL("image/png");
-            var fd = new FormData();
-            fd.append(location.origin + location.pathname, imgData);
-            fetch(URL_INI + url, {
-                method: 'POST',
-                headers: {
-                    'content-type': 'application/json'
-                },
-                body: fd,
-            });
-        }
-    })
+function sendPageCapture(page_version_id) {
+    documentSizing();
+    chrome.runtime.sendMessage({ method: 'capture', url: document.URL }, function(res) {
+        var fd = new FormData();
+        fd.append('image', res.data);
+        fd.append('page_version_id', page_version_id);
+        fetch(URL_INI + url, {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: fd,
+        });
+        var tir = document.getElementById('very_very_tired');
+        tir.parentNode.removeChild(tir);
+    });
+}
+
+function documentSizing() {
+    var w = document.documentElement.scrollWidth / window.width;
+    var h = document.documentElement.scrollHeight / window.height;
+    var ans = 1;
+    if (w > h) {
+        ans = h;
+    } else {
+        ans = w;
+    }
+    if (ans > 1) {
+        ans = 1;
+    }
+
+    _appendStyle('body{overflow:hidden;transform-origin: left top;transform: scale(' + ans + ')}');
+    window.scrollTo(0, 0);
+}
+
+function _appendStyle(style) {
+
+    //style タグを用意
+    const tag = document.createElement('style');
+    tag.setAttribute('id', 'very_very_tired');
+    tag.innerText = style;
+
+    //tag タグ挿入
+    document.head.appendChild(tag);
 }
 
 function exclude_path(str) {
