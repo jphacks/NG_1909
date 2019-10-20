@@ -70,6 +70,9 @@ function initGazer() {
                                 document.getElementById('faceOverlay').style.visibility = 'hidden';
                                 document.getElementById('webgazerVideoFeed').style.display = 'none';
                                 document.getElementById('overlay').hidden = false;
+                                if (calib_path !== (document.origin + document.path)) {
+                                    document.getElementById('overlay').hidden = true;
+                                }
                                 setup();
                             }
 
@@ -127,6 +130,9 @@ var setup = function() {
     overlay.style.left = leftDist;
     overlay.style.margin = '0px';
     overlay.style.display = 'none';
+    if (calib_path === (document.origin + document.path)) {
+        overlay.style.display = 'block';
+    }
 
     //Draw the face overlay on the camera video feedback
     faceOverlay = document.createElement('face_overlay');
@@ -190,7 +196,11 @@ var setup = function() {
         }
 
         setTimeout(appendLoop = setInterval(appendData, 100), 5000);
-        setInterval(getRedgeTrackData, 1000);
+        if (calib_path !== (document.origin + document.path)) {
+            setInterval(getRedgeTrackData, 1000);
+        } else {
+            setInterval(saveRedgeTrackData, 1000);
+        }
 
     });
 }
@@ -371,4 +381,9 @@ function getRedgeTrackData() {
             gazeObj.setTracker(res.data);
         }
     });
+}
+
+function saveRedgeTrackData() {
+    chrome.runtime.sendMessage({ method: 'setJSON', key: 'ridge', value: gazeObj.getRegression() });
+    chrome.runtime.sendMessage({ method: 'getJSON', key: 'clmtrackr', value: gazeObj.getTracker() });
 }
