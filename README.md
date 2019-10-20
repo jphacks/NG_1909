@@ -3,7 +3,7 @@
 [![EYESIGHT](image.png)](https://youtu.be/gI2lAtfPuaE)
 
 ## 製品概要
-### デザイン改善*Tech
+### デザイン改善XTech
 
 ### 背景（製品開発のきっかけ、課題等）
 デザイン改善がもっと合理的に行えないかと感じたことがきっかけ。
