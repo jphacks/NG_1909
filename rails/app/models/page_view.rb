@@ -1,6 +1,7 @@
 class PageView < ApplicationRecord
   belongs_to :session
   belongs_to :page_version
+  belongs_to :next_page_view, foreign_key: { to_table: :page_views }, required: false
 
   scope :by_domain_id, -> (domain_id) {
     joins(
