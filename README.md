@@ -47,10 +47,6 @@ https://drive.google.com/file/d/1rk8FvU4Amk0XbJ8Yf26nk0-DogJ2pG7G/view?usp=shari
 * PC
 
 ### 研究内容・事前開発プロダクト（任意）
-ご自身やチームの研究内容や、事前に持ち込みをしたプロダクトがある場合は、こちらに実績なども含め記載をして下さい。
-
-* 
-* 
 
 
 ### 独自開発技術（Hack Dayで開発したもの）
