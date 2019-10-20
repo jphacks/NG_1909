@@ -77,3 +77,5 @@ https://drive.google.com/file/d/1rk8FvU4Amk0XbJ8Yf26nk0-DogJ2pG7G/view?usp=shari
 * 目線のデータをヒートマップで表示
 * コンバージョンしたかによるフィルタ機能 
 * デザインが変わった時のバージョン管理機能
+
+あとはissueを見ると大体の開発内容が分かるようになっています。
