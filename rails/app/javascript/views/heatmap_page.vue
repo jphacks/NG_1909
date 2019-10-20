@@ -5,6 +5,7 @@
     <!-- {{ page_views }} -->
     <p v-text="content"></p>
     <v-select :items="page_versions" item-text="id" item-value="id" @change="changeVersion" label="バージョン"></v-select>
+    <v-select :items="next_page_views" item-text="id" item-value="id" v-model="filter_next_page" label="フィルター"></v-select>
     <div id='heatMap'></div>
   </div>
 </template>
@@ -44,8 +45,7 @@ export default {
   data: function(){
     return {
       content:'This is heatmapjs page',
-      item:'',
-      itemss:[[{path: "aa", height: 50}, {path: "bb", height: 10}, {path: "cc", height: 10}], [{path: "dd", height: 10}, {path: "ee", height: 15}, {path: "vv", height: 10}],[{path: "dd", height: 10}, {path: "ee", height: 10}, {path: "vv", height: 0}],[{path: "tt", height: 10}, {path: "pp", height: 10}], [{path: "rr", height: 10}]],
+      filter_next_page: null,
       page_versions: [],
       page_views: []
     }
@@ -56,9 +56,24 @@ export default {
     })
   },
   computed: {
+    next_page_views: function(){
+      var npvs = []
+      this.page_views.forEach(function(page_view){
+        if (npvs.indexOf(page_view.next_page_view_id) < 0){ npvs.push(page_view.next_page_view_id) }
+      })
+      console.log("あああ");
+      console.log(npvs);
+      return npvs
+    },
+    display_page_views: function(){
+      return this.page_views.filter(function(view){
+        if ( this.filter_next_page == null ) { return true }
+        return view.next_page_view_id == this.filter_next_page
+      }.bind(this))
+    },
     dots: function(){
       var data = []
-      this.page_views.forEach(function(page_view){
+      this.display_page_views.forEach(function(page_view){
         page_view.gazes.forEach(element => {
           var x=Math.round(element.x*1000);
           var y=Math.round(element.y*1000);
