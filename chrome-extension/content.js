@@ -38,6 +38,11 @@ function initGazer() {
                         clmtrackr = 'clmtrackr';
                     }
 
+                    var predictionPoints = false;
+                    if (calib_path === (location.host + location.path)) {
+                        predictionPoints = true;
+                    }
+
                     gazeObj = webgazer.setRegression(ridge) /* currently must set regression and tracker */
                         .setTracker(clmtrackr)
                         .setGazeListener(function(data, clock) {
@@ -45,7 +50,7 @@ function initGazer() {
                             //   console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
                         })
                         .begin()
-                        .showPredictionPoints(false); /* shows a square every 100 milliseconds where current prediction is */
+                        .showPredictionPoints(predictionPoints); /* shows a square every 100 milliseconds where current prediction is */
                 });
             });
 
@@ -70,9 +75,6 @@ function initGazer() {
                                 document.getElementById('faceOverlay').style.visibility = 'hidden';
                                 document.getElementById('webgazerVideoFeed').style.display = 'none';
                                 document.getElementById('overlay').hidden = false;
-                                if (true /*calib_path !== (location.host + location.path)デモ用*/ ) {
-                                    document.getElementById('overlay').hidden = true;
-                                }
                                 setup();
                             }
 
@@ -130,9 +132,6 @@ var setup = function() {
     overlay.style.left = leftDist;
     overlay.style.margin = '0px';
     overlay.style.display = 'none';
-    if (true /*calib_path === (location.host + location.path)デモ用*/ ) {
-        overlay.style.display = 'block';
-    }
 
     //Draw the face overlay on the camera video feedback
     faceOverlay = document.createElement('face_overlay');
