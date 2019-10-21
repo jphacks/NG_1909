@@ -48,11 +48,10 @@ EyeSightで集まるデータは端的に言うと「どんなレイアウトで
 ## 開発内容・開発技術
 
 chrome extension, javascript, 
-https://drive.google.com/file/d/1rk8FvU4Amk0XbJ8Yf26nk0-DogJ2pG7G/view?usp=sharing
 
 ### 活用した技術
-#### API・データ
-
+#### ER図
+https://drive.google.com/file/d/1rk8FvU4Amk0XbJ8Yf26nk0-DogJ2pG7G/view?usp=sharing
 
 #### フレームワーク・ライブラリ・モジュール
 * 目線の取得
