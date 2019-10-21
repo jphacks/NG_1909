@@ -57,8 +57,6 @@ EyeSightで集まるデータは端的に言うと「どんなレイアウトで
 chrome extension, javascript, 
 
 ### 活用した技術
-#### ER図
-https://drive.google.com/file/d/1rk8FvU4Amk0XbJ8Yf26nk0-DogJ2pG7G/view?usp=sharing
 
 #### フレームワーク・ライブラリ・モジュール
 * 目線の取得
@@ -68,6 +66,10 @@ https://drive.google.com/file/d/1rk8FvU4Amk0XbJ8Yf26nk0-DogJ2pG7G/view?usp=shari
   * Vue.js
 * バックエンド
   * Rails 
+  
+#### ER図
+https://drive.google.com/file/d/1rk8FvU4Amk0XbJ8Yf26nk0-DogJ2pG7G/view?usp=sharing
+
 
 #### デバイス
 * PC
